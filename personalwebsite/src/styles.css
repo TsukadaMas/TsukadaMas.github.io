@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap');
+
+
+
+.bg{
+    background-image: url("./assets/images/bg.png");
+    height: 100%;
+    width: 100%;
+
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+body, html {
+    height: 100%;
+    margin: 0;
+    background-color: black;
+    font-family: 'Comfortaa', cursive;
+    color: white;
+  }
