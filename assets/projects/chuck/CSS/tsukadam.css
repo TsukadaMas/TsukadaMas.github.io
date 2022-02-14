@@ -1,0 +1,10 @@
+body{
+   
+    font-family: arial;
+  }
+
+  .button{
+     font-size: 1.02em;
+     background-color: #EB8388;
+     border-radius: 10px; 
+  }
