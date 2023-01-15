@@ -103,5 +103,8 @@
       }
     }
   },
-  "defaultProject": "personalwebsite"
+  "defaultProject": "personalwebsite",
+  "cli": {
+    "analytics": false
+  }
 }
