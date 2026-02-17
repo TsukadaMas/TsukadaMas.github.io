@@ -1,92 +1,45 @@
 <div class="container ">
+
+    <ng-template #gameModal let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title text-dark">{{ selectedGame?.title }}</h5>
+            <button (click)="modal.dismiss()" type="button" class="close text-dark" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <iframe *ngIf="selectedGame" [src]="getSafeVideoUrl(selectedGame.VideoURL)" width="100%" height="350"
+                frameborder="0" allowfullscreen>
+            </iframe>
+            <p [innerHTML]="selectedGame?.highLevelDescription" class="mt-3 text-dark"></p>
+            <a *ngIf="selectedGame?.link" [href]="selectedGame?.link" target="_blank" class="btn btn-primary mt-2">
+                Visit
+            </a>
+        </div>
+    </ng-template>
+
     <div class="row">
-        <div class="col-lg-4 mb-3 d-flex align-items-stretch gamecard">
-            <div class="card" style="width: 18rem;">
-                <img class="card-img-top" src="../../assets/images/kalios.png" alt="Card image cap">
-                <div class="card-body">
-                    <h5 class="card-title">Kalios</h5>
-                    <p class="card-text">A Procedural generated 2d platform game that has you controlling a character
-                        that can dash, teleport and throw daggers at specific orbs to get to new places, This game was
-                        created with 2 other developers using Unity.</p>
-                    <a href="https://4nz.itch.io/kalios" target="_blank" class="btn btn-primary learnmore">Download The
-                        Demo</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 mb-3 d-flex align-items-stretch gamecard">
-            <div class="card" style="width: 18rem;">
-                <img class="card-img-top" src="../../assets/images/mine_evo.png" alt="Card image cap">
-                <div class="card-body">
-                    <h5 class="card-title">Mine Evolution</h5>
-                    <p class="card-text">This game was created in partnership with <a
-                            href="https://www.cim.org/">CIM</a> and <a href="https://www.sciencenorth.ca/">Science
-                            North</a> to interest student and famlies in the mining industry</p>
-                    <a href="https://mineevolution.ca/" target="_blank" class="btn btn-primary learnmore">Play The
-                        Demo</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 mb-3 d-flex align-items-stretch gamecard">
-            <div class="card" style="width: 18rem;">
-                <iframe  src="https://www.youtube.com/embed/-152LOXaM-g?si=f-YFxqrHpffCKa8f"
-                    title="YouTube video player" frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                <div class="card-body">
-                    <h5 class="card-title">Swarm 2</h5>
-                    <p class="card-text">A fast-paced VR arcade shooter where players use grappling hooks to swing
-                        through arenas and fight off swarms of alien enemies. I was brought on as a contracted developer
-                        to implement the rocket jump mechanic</p>
-                    <a href="https://www.meta.com/experiences/swarm-2/5791805387504648/?srsltid=AfmBOopTYTX-VPVbbTvMvtD6Di428vMFnwIoahqnO_JqAyvEow9k9tzm"
-                        target="_blank" class="btn btn-primary learnmore">Play The Demo</a>
+        <ng-container *ngFor="let game of games; let i = index">
+
+            <div class="col-lg-4 mb-3 d-flex align-items-stretch gamecard">
+                <div class="card" style="width: 18rem;">
+
+                    <img class="card-img-top" (click)="openModal(game, gameModal)" [src]="game.MediaURL"
+                        alt="Card image cap">
+
+                    <div class="card-body">
+                        <h5 class="card-title">{{ game.title }}</h5>
+                        <p class="card-text" [innerHTML]="game.description"></p>
+                        <div (click)="openModal(game, gameModal)" target="_blank" class="btn btn-primary learnmore">
+                            Learn More on What I did
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
-        </div>
+            <div class="w-100" *ngIf="(i + 1) % 3 === 0"></div>
+
+        </ng-container>
     </div>
-    <div class="row">
-        <div class="col-lg-4 mb-3 d-flex align-items-stretch gamecard">
-            <div class="card" style="width: 18rem;">
-                <iframe autoplay src="https://www.youtube.com/embed/3xRu0QcKVNQ" title="mlb hr derby arcade"
-                    frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerpolicy="strict-origin-when-cross-origin">
-
-                </iframe>
-                <div class="card-body">
-                    <h5 class="card-title">MLB VR</h5>
-                    <p class="card-text">A modified version of the <a
-                            href="https://www.meta.com/experiences/mlb-home-run-derby-vr/4468078983226058/?srsltid=AfmBOopE5IQ2LeVFokvTnCz5oj-Dsi91HaEoeTJkS3caDWkq470buh5R">MLB
-                            Home Run Derby VR</a> game, utilizes custom tool to communicate with external devices
-
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 mb-3 d-flex align-items-stretch gamecard">
-            <div class="card" style="width: 18rem;">
-                <video aria-hidden="false" class="x19kjcj4 x186iv6y xh8yej3" width="100%" controls playsinline=""
-                    autoplay loop preload="auto">
-                    <source
-                        src="https://video.wixstatic.com/video/8273cf_aecefcd171da4622b81ffbffb0eb8fc8/1080p/mp4/file.mp4">
-                </video>
-                <div class="card-body">
-                    <h5 class="card-title">Freakout</h5>
-                    <p class="card-text">A rhythem VR game that features dance gates (a pose that the user needs to
-                        match) and uniquely modeled enviroments, that pay hommage to the 80's
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 mb-3 d-flex align-items-stretch gamecard">
-            <div class="card" style="width: 18rem;">
-                <img class="card-img-top" src="../../assets/images/tbahd.png" alt="Card image cap">
-                <div class="card-body">
-                    <h5 class="card-title">The Boy and His Dog</h5>
-                    <p class="card-text">A 2d game about a boy and his dog going on a adventure to vanquish a accident
-                        evil, fight enemies, solve puzzles and uncover the story of what happened</p>
-
-                </div>
-            </div>
-        </div>
-    </div>
+</div>
