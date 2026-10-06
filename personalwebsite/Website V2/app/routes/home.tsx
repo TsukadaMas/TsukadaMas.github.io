@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import type * as Three from "three";
 import type { Route } from "./+types/home";
 
 type Project = {
@@ -171,6 +172,206 @@ function ProjectGrid({
   );
 }
 
+function InteractiveTitle() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    let disposed = false;
+    let disposeScene = () => {};
+    const initialize = async () => {
+      let THREE: typeof import("three");
+      let FontLoaderClass: typeof import("three/addons/loaders/FontLoader.js").FontLoader;
+      let TextGeometryClass: typeof import("three/addons/geometries/TextGeometry.js").TextGeometry;
+      try {
+        const [three, fontLoader, textGeometry] = await Promise.all([
+          import("three"),
+          import("three/addons/loaders/FontLoader.js"),
+          import("three/addons/geometries/TextGeometry.js"),
+        ]);
+        THREE = three;
+        FontLoaderClass = fontLoader.FontLoader;
+        TextGeometryClass = textGeometry.TextGeometry;
+      } catch (error) {
+        console.error("Unable to load the interactive 3D title.", error);
+        return;
+      }
+      if (disposed) return;
+
+      let font: import("three/addons/loaders/FontLoader.js").Font;
+      try {
+        font = await new FontLoaderClass().loadAsync("/assets/helvetiker_bold.typeface.json");
+      } catch (error) {
+        console.error("Unable to load the interactive 3D title font.", error);
+        return;
+      }
+      if (disposed) return;
+
+      let renderer: Three.WebGLRenderer;
+      try {
+        renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+      } catch (error) {
+        console.error("Unable to initialize the interactive 3D title.", error);
+        return;
+      }
+
+      const scene = new THREE.Scene();
+      const geometry = new TextGeometryClass("J Tsukada.", {
+        font,
+        size: 1.1,
+        depth: 0.16,
+        curveSegments: 8,
+        bevelEnabled: true,
+        bevelThickness: 0.025,
+        bevelSize: 0.015,
+        bevelSegments: 2,
+      });
+      geometry.computeBoundingBox();
+      const bounds = geometry.boundingBox;
+      if (!bounds) {
+        geometry.dispose();
+        renderer.dispose();
+        console.error("Unable to measure the interactive 3D title.");
+        return;
+      }
+
+      const titleWidth = bounds.max.x - bounds.min.x;
+      const titleHeight = bounds.max.y - bounds.min.y;
+      const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
+      camera.position.z = 10;
+      geometry.translate(
+        -(bounds.min.x + bounds.max.x) / 2,
+        -(bounds.min.y + bounds.max.y) / 2,
+        -(bounds.min.z + bounds.max.z) / 2,
+      );
+      const material = new THREE.MeshStandardMaterial({
+        color: 0xc2f970,
+        metalness: 0.22,
+        roughness: 0.32,
+      });
+      const title = new THREE.Mesh(geometry, material);
+      const titleGroup = new THREE.Group();
+      const backTitle = new THREE.Mesh(geometry, material);
+      backTitle.rotation.y = Math.PI;
+      backTitle.visible = false;
+      titleGroup.add(title, backTitle);
+      scene.add(new THREE.AmbientLight(0xffffff, 1.8));
+      const keyLight = new THREE.DirectionalLight(0xffffff, 2.5);
+      keyLight.position.set(-2, 3, 5);
+      scene.add(keyLight);
+      const rimLight = new THREE.DirectionalLight(0x8baa4e, 1.2);
+      rimLight.position.set(2, -1, -3);
+      scene.add(rimLight);
+      scene.add(titleGroup);
+
+      const render = () => renderer.render(scene, camera);
+      const setRotationY = (angle: number) => {
+        titleGroup.rotation.y = angle % (Math.PI * 2);
+        title.visible = Math.cos(titleGroup.rotation.y) >= 0;
+        backTitle.visible = !title.visible;
+      };
+      setRotationY(0);
+      let animationFrame = 0;
+      let previousTime = 0;
+      const animate = (time: number) => {
+        if (previousTime) setRotationY(titleGroup.rotation.y - Math.min((time - previousTime) / 1000, 0.05) * 0.35);
+        previousTime = time;
+        render();
+        animationFrame = requestAnimationFrame(animate);
+      };
+      const resize = () => {
+        const { width, height } = canvas.getBoundingClientRect();
+        if (!width || !height) return;
+
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(width, height, false);
+        const aspect = width / height;
+        const viewHeight = Math.max(titleHeight / 0.8, titleWidth / aspect / 0.82);
+        camera.top = viewHeight / 2;
+        camera.bottom = -viewHeight / 2;
+        camera.left = (-viewHeight * aspect) / 2;
+        camera.right = (viewHeight * aspect) / 2;
+        camera.updateProjectionMatrix();
+        camera.lookAt(0, 0, 0);
+        render();
+        setReady(true);
+      };
+
+      let pointer: { id: number; x: number } | null = null;
+      const onPointerDown = (event: PointerEvent) => {
+        pointer = { id: event.pointerId, x: event.clientX };
+        canvas.setPointerCapture(event.pointerId);
+      };
+      const onPointerMove = (event: PointerEvent) => {
+        if (!pointer || pointer.id !== event.pointerId) return;
+        const deltaX = event.clientX - pointer.x;
+        setRotationY(titleGroup.rotation.y + deltaX * 0.01);
+        pointer.x = event.clientX;
+        render();
+      };
+      const onPointerUp = (event: PointerEvent) => {
+        if (pointer?.id === event.pointerId) pointer = null;
+      };
+      const onKeyDown = (event: KeyboardEvent) => {
+        const step = 0.12;
+        if (event.key === "ArrowLeft") setRotationY(titleGroup.rotation.y - step);
+        else if (event.key === "ArrowRight") setRotationY(titleGroup.rotation.y + step);
+        else if (event.key === "Home") setRotationY(0);
+        else return;
+        event.preventDefault();
+        render();
+      };
+
+      canvas.addEventListener("pointerdown", onPointerDown);
+      canvas.addEventListener("pointermove", onPointerMove);
+      canvas.addEventListener("pointerup", onPointerUp);
+      canvas.addEventListener("pointercancel", onPointerUp);
+      canvas.addEventListener("keydown", onKeyDown);
+      window.addEventListener("resize", resize);
+      resize();
+      animationFrame = requestAnimationFrame(animate);
+
+      disposeScene = () => {
+        cancelAnimationFrame(animationFrame);
+        canvas.removeEventListener("pointerdown", onPointerDown);
+        canvas.removeEventListener("pointermove", onPointerMove);
+        canvas.removeEventListener("pointerup", onPointerUp);
+        canvas.removeEventListener("pointercancel", onPointerUp);
+        canvas.removeEventListener("keydown", onKeyDown);
+        window.removeEventListener("resize", resize);
+        geometry.dispose();
+        material.dispose();
+        renderer.dispose();
+      };
+    };
+
+    void initialize();
+    return () => {
+      disposed = true;
+      disposeScene();
+    };
+  }, []);
+
+  return (
+    <span className="hero-title-3d">
+      <canvas
+        ref={canvasRef}
+        className="hero-title-canvas"
+        role="img"
+        aria-label="Interactive 3D text J Tsukada, slowly spinning counterclockwise around its vertical axis. Drag horizontally or use the left and right arrow keys to rotate; use Home to reset."
+        tabIndex={0}
+        aria-describedby="title-rotation-hint"
+      />
+      <span className={`hero-title-fallback${ready ? " is-ready" : ""}`} aria-hidden="true">
+        J Tsukada.
+      </span>
+    </span>
+  );
+}
+
 export default function Home() {
   const [activeTab, setActiveTab] = useState<"games" | "other">("games");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -206,10 +407,14 @@ export default function Home() {
               <span className="status-dot" /> Software developer · Game maker
             </p>
             <h1 id="hero-title">
-              Masamichi
-              <br />
-              <span>J Tsukada.</span>
+              <span className="visually-hidden">Masamichi J Tsukada.</span>
+              <span aria-hidden="true">Masamichi</span>
+              <br aria-hidden="true" />
+              <InteractiveTitle />
             </h1>
+            <p className="title-rotation-hint" id="title-rotation-hint">
+              Drag horizontally or use left/right arrows · Home to reset
+            </p>
             <p className="hero-description">
               Programming turned my pastime into my profession. I love learning
               new tools, collaborating with people, and bringing ideas to life.
@@ -369,7 +574,7 @@ export default function Home() {
           <div className="contact-grid">
             <article className="contact-card">
               <span className="contact-label">Email</span>
-              <a href="mailto:tsukada.m@hotmail.com">
+              <a href="mailto:tsukada.m@hotmail.com?subject=Reaching%20out%20regarding%20work">
                 tsukada.m@hotmail.com <span aria-hidden="true">↗</span>
               </a>
               <p>Send me a message about your next project.</p>
@@ -406,10 +611,10 @@ export default function Home() {
         onClose={() => setSelectedProject(null)}
       >
         {selectedProject && (
-          <>
-            <div className="dialog-header">
+          <article className="resume-page">
+            <header className="resume-header">
               <div>
-                <p className="eyebrow">Project details</p>
+                <p className="eyebrow">Selected work / Project profile</p>
                 <h2 id="dialog-title">{selectedProject.title}</h2>
               </div>
               <button
@@ -420,30 +625,63 @@ export default function Home() {
               >
                 ×
               </button>
-            </div>
-            {selectedProject.video && (
-              <div className="video-wrap">
-                <iframe
-                  src={selectedProject.video}
-                  title={`${selectedProject.title} video`}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                />
+            </header>
+
+            <section className="resume-summary" aria-label="Project summary">
+              <img
+                src={
+                  selectedProject.image.startsWith("http")
+                    ? selectedProject.image
+                    : `/assets/${selectedProject.image}`
+                }
+                alt=""
+              />
+              <div>
+                <span className="resume-label">Overview</span>
+                <p>{selectedProject.description}</p>
               </div>
+            </section>
+
+            <section className="resume-entry">
+              <div className="resume-entry-label">
+                <span className="resume-index">01</span>
+                <span className="resume-label">Role &amp; contribution</span>
+              </div>
+              <p>{selectedProject.details}</p>
+            </section>
+
+            {selectedProject.video && (
+              <section className="resume-entry">
+                <div className="resume-entry-label">
+                  <span className="resume-index">02</span>
+                  <span className="resume-label">Project media</span>
+                </div>
+                <div className="video-wrap">
+                  <iframe
+                    src={selectedProject.video}
+                    title={`${selectedProject.title} video`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                  />
+                </div>
+              </section>
             )}
-            <p className="dialog-description">{selectedProject.details}</p>
-            {selectedProject.link && (
-              <a
-                className="dialog-link"
-                href={selectedProject.link}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Visit project <span aria-hidden="true">↗</span>
-              </a>
-            )}
-          </>
+
+            <footer className="resume-footer">
+              <span>Masamichi J Tsukada / Portfolio</span>
+              {selectedProject.link && (
+                <a
+                  className="dialog-link"
+                  href={selectedProject.link}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Visit project <span aria-hidden="true">↗</span>
+                </a>
+              )}
+            </footer>
+          </article>
         )}
       </dialog>
     </>
