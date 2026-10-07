@@ -394,6 +394,7 @@ export default function Home() {
         <nav aria-label="Main navigation">
           <a href="#profile">Portfolio</a>
           <a href="#contact">Contact</a>
+          <a href="/BagelIsLost">Find Bagel</a>
           <a href="/assets/Masamichi%20J%20Tsukada.pdf" target="_blank" rel="noreferrer">
             Download CV
           </a>
