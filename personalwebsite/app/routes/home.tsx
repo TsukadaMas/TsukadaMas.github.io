@@ -290,6 +290,7 @@ function InteractiveTitle() {
         renderer.setSize(width, height, false);
         const aspect = width / height;
         const viewHeight = Math.max(titleHeight / 0.8, titleWidth / aspect / 0.82);
+        titleGroup.position.x = (titleWidth - viewHeight * aspect) / 2;
         camera.top = viewHeight / 2;
         camera.bottom = -viewHeight / 2;
         camera.left = (-viewHeight * aspect) / 2;
