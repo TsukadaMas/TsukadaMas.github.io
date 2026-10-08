@@ -23,20 +23,20 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: personalwebsite/Website V2/package-lock.json
+          cache-dependency-path: personalwebsite/package-lock.json
       - uses: actions/configure-pages@v5
       - name: Install dependencies
-        working-directory: personalwebsite/Website V2
+        working-directory: personalwebsite
         run: npm ci
       - name: Check and build
-        working-directory: personalwebsite/Website V2
+        working-directory: personalwebsite
         run: |
           npm run typecheck
           npm run build
           cp build/client/index.html build/client/404.html
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: personalwebsite/Website V2/build/client
+          path: personalwebsite/build/client
 
   deploy:
     environment:

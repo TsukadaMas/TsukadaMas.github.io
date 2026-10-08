@@ -1,27 +1,20 @@
-# Personalwebsite
+# Personal Website
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.2.3.
+React Router portfolio website.
 
-## Development server
+## Run locally
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+```sh
+npm install
+npm run dev
+```
 
-## Code scaffolding
+The portfolio page includes the existing games and other projects, project detail dialogs, contact links, and CV. Images and the CV are served from `public/assets`.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Run `npm run typecheck` and `npm run build` to validate a production build.
 
-## Build
+## Deploy to GitHub Pages
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+The `page-v2` branch deploys this app to GitHub Pages through `.github/workflows/deploy.yml`.
+In the repository settings, set **Pages → Build and deployment → Source** to **GitHub Actions**.
+The SPA build includes a `404.html` fallback so direct visits to client-side routes work.
