@@ -74,6 +74,16 @@ const games: Project[] = [
 
 const otherProjects: Project[] = [
   {
+    title: "Tekmate",
+    description:
+      "A Unity-based platform for creating customizable, interactive 3D instructional manuals without programming.",
+    details:
+      "I engineered a Unity and C# runtime authoring environment so users can create, edit, organize, and manage 3D manuals without programming. I built raycast-based component selection and tools for moving, rotating, hiding, and recolouring model parts, plus an animation sequencer for transitions between instructional steps. I developed annotation tools for freehand drawing, erasing, arrows, highlights, and text, as well as guide management for creating, editing, reordering, and deleting steps with images, videos, 3D animations, and tool demonstrations. I integrated CAD-derived models, adjusting pivots and hierarchies for part manipulation and animation, and contributed to the initial relational database architecture and API design for models, guides, and related content.",
+    image: "tekmate-sq.png",
+    video: "/assets/tekmate_demo.mp4",
+    link: "https://www.atteria.com/tekmate/",
+  },
+  {
     title: "Klocked",
     description:
       "A mobile application where I developed features including real-world highlights, virtual pets, and loot boxes.",
@@ -440,57 +450,51 @@ export default function Home() {
 
         <section className="featured section-wrap" aria-labelledby="featured-title">
           <div className="featured-heading">
-            <p className="eyebrow">Featured project · Games</p>
+            <p className="eyebrow">Featured project · Software</p>
             <span className="section-count">01 / 01</span>
           </div>
           <div className="featured-card">
             <div className="featured-overview">
-              <img
-                className="featured-image"
-                src="/assets/mine_evo.png"
-                alt="Mine Evolution game world"
-              />
-              <div className="featured-copy">
-                <p className="featured-kicker">Education · Unity · Ongoing support</p>
-                <h2 id="featured-title">Mine Evolution</h2>
+              <button
+                className="featured-copy"
+                type="button"
+                aria-label="View details for Tekmate"
+                onClick={() => setSelectedProject(otherProjects[0])}
+              >
+                <p className="featured-kicker">Unity · C# · Interactive 3D manuals</p>
+                <h2 id="featured-title">Tekmate</h2>
                 <p className="featured-description">
-                  An educational game created with the Canadian Institute of
-                  Mining and Science North to spark interest in mining for
-                  students and families.
+                  Tekmate lets people create and manage customizable 3D
+                  instructional manuals without programming, combining
+                  interactive models, step-by-step guides, and multimedia.
                 </p>
                 <div className="featured-facts">
                   <div>
-                    <span>My contribution</span>
-                    <p>UI, mini-games, underground mine logic, and ongoing maintenance.</p>
+                    <span>My role</span>
+                    <p>Built the Unity/C# authoring environment and interactive 3D model tools.</p>
                   </div>
                   <div>
-                    <span>Recognition</span>
-                    <p>Silver award recipient at the Serious Games Awards.</p>
+                    <span>Instruction tools</span>
+                    <p>Developed annotations, animation sequencing, and flexible guide management.</p>
                   </div>
                 </div>
-                <div className="featured-links">
-                  <a
-                    className="text-link"
-                    href="https://mineevolution.ca/"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Visit Mine Evolution <span aria-hidden="true">↗</span>
-                  </a>
-                  <a className="text-link" href="#profile">
-                    Browse all projects <span aria-hidden="true">↓</span>
-                  </a>
-                </div>
+              </button>
+              <div className="featured-links">
+                <a
+                  className="text-link"
+                  href="https://www.atteria.com/tekmate/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Visit Tekmate <span aria-hidden="true">↗</span>
+                </a>
+                <a className="text-link" href="#profile">
+                  Browse all projects <span aria-hidden="true">↓</span>
+                </a>
               </div>
             </div>
             <div className="featured-video">
-              <iframe
-                src="https://www.youtube.com/embed/ckTiKW8J584?autoplay=1&mute=1&playsinline=1"
-                title="Mine Evolution gameplay"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-              />
+              <video src="/assets/tekmate_demo.mp4" title="Tekmate product demo" autoPlay controls muted playsInline />
             </div>
           </div>
         </section>
@@ -659,13 +663,17 @@ export default function Home() {
                   <span className="resume-label">Project media</span>
                 </div>
                 <div className="video-wrap">
-                  <iframe
-                    src={selectedProject.video}
-                    title={`${selectedProject.title} video`}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    referrerPolicy="strict-origin-when-cross-origin"
-                    allowFullScreen
-                  />
+                  {selectedProject.video.startsWith("http") ? (
+                    <iframe
+                      src={selectedProject.video}
+                      title={`${selectedProject.title} video`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <video src={selectedProject.video} title={`${selectedProject.title} video`} controls playsInline />
+                  )}
                 </div>
               </section>
             )}
