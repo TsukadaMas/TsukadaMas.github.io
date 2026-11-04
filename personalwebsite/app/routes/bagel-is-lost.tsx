@@ -64,15 +64,19 @@ export default function BagelIsLost() {
             </div>
           </div>
           <figure className="bagel-photo-frame">
-            {bagelPhotos.map((photo, index) => (
-              <img
-                key={photo}
-                className={`bagel-photo${index === photoIndex ? " is-active" : ""}`}
-                src={photo}
-                alt={index === photoIndex ? "Bagel, an orange cat" : ""}
-                aria-hidden={index !== photoIndex}
-              />
-            ))}
+            <div className="bagel-photo-ring" aria-hidden="true">
+              <div className="bagel-photo-hole">
+                {bagelPhotos.map((photo, index) => (
+                  <img
+                    key={photo}
+                    className={`bagel-photo${index === photoIndex ? " is-active" : ""}`}
+                    src={photo}
+                    alt={index === photoIndex ? "Bagel, an orange cat" : ""}
+                    aria-hidden={index !== photoIndex}
+                  />
+                ))}
+              </div>
+            </div>
             <figcaption>Bagel</figcaption>
           </figure>
         </section>
