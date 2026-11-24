@@ -797,6 +797,123 @@ button:focus-visible {
   padding: 0 0 88px;
 }
 
+.care-page {
+  padding-right: 6vw;
+  padding-left: 6vw;
+  padding-top: 72px;
+  padding-bottom: 88px;
+}
+
+.care-guide {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.care-guide h1 {
+  margin: 0;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  letter-spacing: -0.075em;
+}
+
+.care-intro {
+  margin: 16px 0 36px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.care-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.care-card-advance,
+.care-hint {
+  display: none;
+}
+
+@keyframes care-card-send-back {
+  to {
+    opacity: 0;
+    transform: translate(22px, -10px) scale(0.9) rotate(5deg);
+  }
+}
+
+@keyframes care-card-bring-forward {
+  from {
+    opacity: 0.72;
+    transform: translateY(12px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.care-card {
+  padding: 24px;
+  border: 1px solid var(--line);
+  background: #fffdf9;
+}
+
+.care-card h2 {
+  margin: 0 0 16px;
+  font-size: 1.35rem;
+  letter-spacing: -0.04em;
+}
+
+.care-card h3 {
+  margin: 22px 0 8px;
+  font-size: 0.9rem;
+}
+
+.care-card p,
+.care-card li,
+.care-meals dd {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.care-card p {
+  margin: 10px 0;
+}
+
+.care-card ul {
+  display: grid;
+  gap: 8px;
+  padding-left: 20px;
+}
+
+.care-card strong {
+  color: var(--text);
+}
+
+.care-meals {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.care-meals > div {
+  padding: 12px;
+  background: #fff7ee;
+}
+
+.care-meals dt {
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 650;
+  text-transform: uppercase;
+}
+
+.care-meals dd {
+  margin: 4px 0 0;
+  color: var(--text);
+}
+
 .bagel-help h2 {
   margin: 12px 0;
   font-size: clamp(1.8rem, 4vw, 2.8rem);
@@ -1168,6 +1285,106 @@ button:focus-visible {
     grid-template-columns: 1fr;
   }
 
+  .care-page {
+    display: flex;
+    align-items: center;
+    min-height: calc(100dvh - 135px);
+    padding: 24px 6vw;
+  }
+
+  .care-grid {
+    position: relative;
+    grid-template-columns: 1fr;
+  }
+
+  .care-intro {
+    display: none;
+  }
+
+  .care-guide h1 {
+    margin-bottom: 18px;
+    font-size: clamp(2.2rem, 9vw, 3rem);
+  }
+
+  .care-card:not(.is-active):not(.is-next) {
+    visibility: hidden;
+  }
+
+  .care-card {
+    position: relative;
+    grid-column: 1;
+    grid-row: 1;
+    padding: 18px;
+  }
+
+  .care-card.is-active {
+    z-index: 2;
+  }
+
+  .care-card.is-next {
+    z-index: 1;
+    opacity: 0.72;
+    transform: translateY(12px) scale(0.96);
+  }
+
+  .care-grid.is-flipping .care-card.is-flipping {
+    animation: care-card-send-back 420ms ease-in forwards;
+  }
+
+  .care-grid.is-flipping .care-card.is-next {
+    animation: care-card-bring-forward 420ms ease-out forwards;
+  }
+
+  .care-card-advance {
+    position: absolute;
+    z-index: 3;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .care-card-advance:focus-visible {
+    outline-offset: 3px;
+  }
+
+  .care-hint {
+    display: block;
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: 0.75rem;
+    text-align: center;
+  }
+
+  .care-card h2 {
+    margin-bottom: 10px;
+  }
+
+  .care-card ul {
+    gap: 5px;
+    margin: 10px 0;
+  }
+
+  .care-card p,
+  .care-card li,
+  .care-meals dd {
+    font-size: 0.84rem;
+    line-height: 1.45;
+  }
+
+  .care-meals {
+    gap: 5px;
+    margin: 10px 0;
+  }
+
+  .care-meals > div {
+    padding: 8px 10px;
+  }
+
   .bagel-print-notice {
     grid-template-columns: 1fr;
   }
@@ -1214,6 +1431,11 @@ button:focus-visible {
   *::before,
   *::after {
     transition-duration: 0.01ms !important;
+  }
+
+  .care-grid.is-flipping .care-card.is-flipping,
+  .care-grid.is-flipping .care-card.is-next {
+    animation-duration: 0.01ms;
   }
 
 }

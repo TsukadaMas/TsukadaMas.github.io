@@ -35,7 +35,9 @@ export default function BagelIsLost() {
     <>
       <header className="site-header bagel-header">
         <span className="bagel-wordmark">Bagel</span>
-        <span className="bagel-header-note">Missing cat</span>
+        <a className="bagel-header-note" href="/BagelCare">
+          Care guide
+        </a>
       </header>
 
       <main className="bagel-page">

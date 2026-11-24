@@ -406,6 +406,7 @@ export default function Home() {
           <a href="#profile">Portfolio</a>
           <a href="#contact">Contact</a>
           <a href="/BagelIsLost">Find Bagel</a>
+          <a href="/BagelCare">Bagel care</a>
           <a href="/assets/Masamichi%20J%20Tsukada.pdf" target="_blank" rel="noreferrer">
             Download CV
           </a>
